@@ -31,7 +31,7 @@ matrix:
       before_script:
       - bundle exec rake 'litmus:provision_list[travis_deb]'
       - bundle exec bolt command run 'apt-get install wget -y' --inventoryfile inventory.yaml --nodes='*'
-      - bundle exec rake 'litmus:install_agent[puppet5]'
+      - if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then bundle exec rake 'litmus:install_agent[puppet5-nightly]'; else  bundle exec rake 'litmus:install_agent[puppet5]'; fi
       - bundle exec rake litmus:install_module
       script:
       - bundle exec rake litmus:acceptance:parallel
@@ -45,7 +45,7 @@ matrix:
       before_script:
       - bundle exec rake 'litmus:provision_list[travis_deb]'
       - bundle exec bolt command run 'apt-get install wget -y' --inventoryfile inventory.yaml --nodes='*'
-      - bundle exec rake 'litmus:install_agent[puppet6]'
+      - if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then bundle exec rake 'litmus:install_agent[puppet6-nightly]'; else  bundle exec rake 'litmus:install_agent[puppet6]'; fi
       - bundle exec rake litmus:install_module
       script:
       - bundle exec rake litmus:acceptance:parallel
@@ -58,7 +58,7 @@ matrix:
       rvm: 2.5.3
       before_script:
       - bundle exec rake 'litmus:provision_list[travis_el7]'
-      - bundle exec rake 'litmus:install_agent[puppet5]'
+      - if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then bundle exec rake 'litmus:install_agent[puppet5-nightly]'; else  bundle exec rake 'litmus:install_agent[puppet5]'; fi
       - bundle exec rake litmus:install_module
       script:
       - bundle exec rake litmus:acceptance:parallel
@@ -71,7 +71,7 @@ matrix:
       rvm: 2.5.3
       before_script:
       - bundle exec rake 'litmus:provision_list[travis_el7]'
-      - bundle exec rake 'litmus:install_agent[puppet6]'
+      - if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then bundle exec rake 'litmus:install_agent[puppet6-nightly]'; else  bundle exec rake 'litmus:install_agent[puppet6]'; fi 
       - bundle exec rake litmus:install_module
       script:
       - bundle exec rake litmus:acceptance:parallel
@@ -96,5 +96,6 @@ branches:
     - master
     - /^v\d/
     - release
+    - /^travis.+/
 notifications:
   email: false
