@@ -1,101 +1,100 @@
----
 dist: xenial
 language: ruby
 cache: bundler
 before_install:
-  - bundle -v
-  - rm -f Gemfile.lock
-  - gem update --system $RUBYGEMS_VERSION
-  - gem --version
-  - bundle -v
+- bundle -v
+- rm -f Gemfile.lock
+- gem update --system $RUBYGEMS_VERSION
+- gem --version
+- bundle -v
 script:
-  - 'bundle exec rake $CHECK'
-bundler_args: --without system_tests
+- bundle exec rake $CHECK
+bundler_args: "--without system_tests"
 rvm:
-  - 2.5.3
+- 2.5.3
 stages:
-  - static
-  - spec
-  - acceptance
-  -
-    if: tag =~ ^v\d
-    name: deploy
+- static
+- spec
+- acceptance
+- if: tag =~ ^v\d
+  name: deploy
 matrix:
   fast_finish: true
   include:
-    -
-      bundler_args:
-      dist: trusty
-      env: PLATFORMS=deb_puppet5
-      rvm: 2.5.3
-      before_script:
-      - bundle exec rake 'litmus:provision_list[travis_deb]'
-      - bundle exec bolt command run 'apt-get install wget -y' --inventoryfile inventory.yaml --nodes='*'
-      - if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then bundle exec rake 'litmus:install_agent[puppet5-nightly]'; else  bundle exec rake 'litmus:install_agent[puppet5]'; fi
-      - bundle exec rake litmus:install_module
-      script:
-      - bundle exec rake litmus:acceptance:parallel
-      services: docker
-      sudo: required
-    -
-      bundler_args:
-      dist: trusty
-      env: PLATFORMS=deb_puppet6
-      rvm: 2.5.3
-      before_script:
-      - bundle exec rake 'litmus:provision_list[travis_deb]'
-      - bundle exec bolt command run 'apt-get install wget -y' --inventoryfile inventory.yaml --nodes='*'
-      - if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then bundle exec rake 'litmus:install_agent[puppet6-nightly]'; else  bundle exec rake 'litmus:install_agent[puppet6]'; fi
-      - bundle exec rake litmus:install_module
-      script:
-      - bundle exec rake litmus:acceptance:parallel
-      services: docker
-      sudo: required
-    -
-      bundler_args:
-      dist: trusty
-      env: PLATFORMS=el7_puppet5
-      rvm: 2.5.3
-      before_script:
-      - bundle exec rake 'litmus:provision_list[travis_el7]'
-      - if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then bundle exec rake 'litmus:install_agent[puppet5-nightly]'; else  bundle exec rake 'litmus:install_agent[puppet5]'; fi
-      - bundle exec rake litmus:install_module
-      script:
-      - bundle exec rake litmus:acceptance:parallel
-      services: docker
-      sudo: required
-    -
-      bundler_args:
-      dist: trusty
-      env: PLATFORMS=el7_puppet6
-      rvm: 2.5.3
-      before_script:
-      - bundle exec rake 'litmus:provision_list[travis_el7]'
-      - if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then bundle exec rake 'litmus:install_agent[puppet6-nightly]'; else  bundle exec rake 'litmus:install_agent[puppet6]'; fi 
-      - bundle exec rake litmus:install_module
-      script:
-      - bundle exec rake litmus:acceptance:parallel
-      services: docker
-      sudo: required
-    -
-      env: CHECK="check:symlinks check:git_ignore check:dot_underscore check:test_file rubocop syntax lint metadata_lint"
-      stage: static
-    -
-      env: PUPPET_GEM_VERSION="~> 5.0" CHECK=parallel_spec
-      rvm: 2.4.5
-      stage: spec
-    -
-      env: PUPPET_GEM_VERSION="~> 6.0" CHECK=parallel_spec
-      rvm: 2.5.3
-      stage: spec
-    -
-      env: DEPLOY_TO_FORGE=yes
-      stage: deploy
+  - bundler_args: 
+    dist: trusty
+    env: PLATFORMS=deb_puppet5
+    rvm: 2.5.3
+    before_script:
+    - bundle exec rake 'litmus:provision_list[travis_deb]'
+    - bundle exec bolt command run 'apt-get install wget -y' --inventoryfile inventory.yaml
+      --nodes='*'
+    - if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then bundle exec rake 'litmus:install_agent[puppet5-nightly]';
+      else  bundle exec rake 'litmus:install_agent[puppet5]'; fi
+    - bundle exec rake litmus:install_module
+    script:
+    - bundle exec rake litmus:acceptance:parallel
+    services: docker
+    sudo: required
+  - bundler_args: 
+    dist: trusty
+    env: PLATFORMS=deb_puppet6
+    rvm: 2.5.3
+    before_script:
+    - bundle exec rake 'litmus:provision_list[travis_deb]'
+    - bundle exec bolt command run 'apt-get install wget -y' --inventoryfile inventory.yaml
+      --nodes='*'
+    - if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then bundle exec rake 'litmus:install_agent[puppet6-nightly]';
+      else  bundle exec rake 'litmus:install_agent[puppet6]'; fi
+    - bundle exec rake litmus:install_module
+    script:
+    - bundle exec rake litmus:acceptance:parallel
+    services: docker
+    sudo: required
+  - bundler_args: 
+    dist: trusty
+    env: PLATFORMS=el7_puppet5
+    rvm: 2.5.3
+    before_script:
+    - bundle exec rake 'litmus:provision_list[travis_el7]'
+    - if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then bundle exec rake 'litmus:install_agent[puppet5-nightly]';
+      else  bundle exec rake 'litmus:install_agent[puppet5]'; fi
+    - bundle exec rake litmus:install_module
+    script:
+    - bundle exec rake litmus:acceptance:parallel
+    services: docker
+    sudo: required
+  - bundler_args: 
+    dist: trusty
+    env: PLATFORMS=el7_puppet6
+    rvm: 2.5.3
+    before_script:
+    - bundle exec rake 'litmus:provision_list[travis_el7]'
+    - if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then bundle exec rake 'litmus:install_agent[puppet6-nightly]';
+      else  bundle exec rake 'litmus:install_agent[puppet6]'; fi
+    - bundle exec rake litmus:install_module
+    script:
+    - bundle exec rake litmus:acceptance:parallel
+    services: docker
+    sudo: required
+  - env: CHECK="check:symlinks check:git_ignore check:dot_underscore check:test_file
+      rubocop syntax lint metadata_lint"
+    stage: static
+  - env: PUPPET_GEM_VERSION="~> 5.0" CHECK=parallel_spec
+    rvm: 2.4.5
+    stage: spec
+  - env: PUPPET_GEM_VERSION="~> 6.0" CHECK=parallel_spec
+    rvm: 2.5.3
+    stage: spec
+  - env: DEPLOY_TO_FORGE=yes
+    stage: deploy
 branches:
   only:
-    - master
-    - /^v\d/
-    - release
-    - /^travis.+/
+  - master
+  - "/^v\\d/"
+  - release
+  - "/^travis.+/"
 notifications:
   email: false
+  slack:
+    secure: fqpwOmA1ZyFTrErnnxcrrrFSrBCT5bQI8FAM0bxHcm/um67zCSNKCqY0UFU8GO/0qLnjiPXGS0qEkCnZRN5UH8cTG08VrlgvafOBxn9NEgTw6FBoMY0Qyuaodwi0n2j9AAuJrS2fxgxP2+upfsmtXS84wcleqK8Sd8LZxQF3ZkQ=
